@@ -21,6 +21,7 @@ Additional features include :
 - MTP mode to read/write audio files on the SD card over USB
 - No coding required to add a playlist for a new NFC tag (the NFC id just needs to match the name of a folder on the SD card)
 - Working headphone jack (mono though, which isn't convenient for modern headphones)
+- Boot animation and SFX from a movie that came out one year after the Jackal
 - And probably more useless stuff even I don't remember
 
 ## Hardware overview

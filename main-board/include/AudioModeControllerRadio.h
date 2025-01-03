@@ -18,14 +18,13 @@ public:
         freq(SNVS_LPGPR0) // Load last frequency from NVRAM
   {
     // https://rgbcolorpicker.com/565
-    // https://lospec.com/palette-list/cyberpunk-neons
-    theme.clockColor = 0xd9cd;
-    theme.fftFront = 0xd9cd;
-    theme.fftBack = 0x0a8c;
-    theme.fftMain = 0x575c;
-    theme.metadataLine1 = 0x575c;
-    theme.metadataLine2 = 0xd9cd;
-    theme.modeTitle = 0x575c;
+    theme.modeTitle = 0xfc86;
+    theme.clockColor = 0xc224;
+    theme.fftMain = 0xfda4;
+    theme.fftFront = 0xfd4d;
+    theme.fftBack = 0xf800;
+    theme.metadataLine1 = 0xfc86;
+    theme.metadataLine2 = 0xc224;
   }
 
   AudioMode getMode() override

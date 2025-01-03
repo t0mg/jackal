@@ -181,68 +181,27 @@ void I2C::loop()
   }
 }
 
-// Helper function to process analog values with spike filtering
-static bool isWithinTolerance(byte a, byte b, byte tolerance = 2)
-{
-  return abs(a - b) <= tolerance;
-}
-
-static void processAnalogValue(byte newValue, byte &currentValue, int8_t &skippedValue, bool warmingUp = false, int threshold = 10, bool allowDecrease = false)
+static void processAnalogValue(byte newValue, byte &currentValue, bool warmingUp = false)
 {
 
   // Allow first reading to pass through
-  if (warmingUp || (allowDecrease && newValue < currentValue)) {
+  if (warmingUp) {
       currentValue = newValue;
       LOG_I2C_MSGF("Initial value set: %d\n", newValue);
       return;
   }
 
-  if (newValue != currentValue)
-  {
-    if (newValue != 0 && abs(newValue - currentValue) > threshold)
-    {
-      if (skippedValue == -1)
-      {
-        // First detection of large jump - skip this value
-        // LOG_I2C_MSGF("Skipping large value change: %d -> %d\n", currentValue, newValue);
-        skippedValue = newValue;
-      }
-      else if (!isWithinTolerance(newValue, skippedValue) && newValue != currentValue)
-      {
-        // New value different from both current and skipped - accept it
-        // LOG_I2C_MSGF("Accepting value after skip: %d -> %d\n", currentValue, newValue);
-        currentValue = newValue;
-        skippedValue = -1;
-      }
-      else
-      {
-        // LOG_I2C_MSGF("Skipping large value change AGAIN: %d -> %d\n", currentValue, newValue); 
-        skippedValue = newValue;
-      }
-    }
-    else
-    {
-      // Small changes and jumps to 0 accepted immediately
-      // LOG_I2C_MSGF("Accepting small value change: %d -> %d\n", currentValue, newValue);
-      currentValue = newValue;
-      skippedValue = -1;
-    }
+  // Smooth out the value with a recursive filter
+  currentValue = (float)currentValue * 0.7 + (float)newValue * 0.3;
+  // Make zero values more stable
+  if (newValue < 2) {
+    currentValue = 0;
   }
 }
 
 bool I2C::requestDataFromIO(bool isRetry)
 {
   static const int IO_DATA_LENGTH = 13;
-
-  // Track skipped values for each analog input (-1 means no skip in progress)
-  static struct
-  {
-    int8_t volume = -1;
-    int8_t tone = -1;
-    int8_t tuning = -1;
-    int8_t brightness = -1;
-    int8_t fmValue = -1;
-  } skippedValues;
 
   Wire1.requestFrom(static_cast<int>(IO_BOARD_I2C_ADDRESS), IO_DATA_LENGTH);
 
@@ -280,7 +239,7 @@ bool I2C::requestDataFromIO(bool isRetry)
                 LOG_I2C_MSGF("NFC UID changed (no tag): %s\n", newNfcUidString.c_str());
                 ioState_.nfcUidString = newNfcUidString;
                 if (nfcTagCallback_) {
-                    nfcTagCallback_(newNfcUidString);
+                    nfcTagCallback_("000000000000FF");
                 }
                 noTagTimerStarted = false;
             }
@@ -347,16 +306,14 @@ bool I2C::requestDataFromIO(bool isRetry)
 
     // Process all analog values with spike filtering
     bool isWarmingUp = i2cTimer.isWarmingUp();
-    processAnalogValue(rawVolume, ioState_.volume, skippedValues.volume, isWarmingUp);
-    processAnalogValue(rawTone, ioState_.tone, skippedValues.tone, isWarmingUp);
-    processAnalogValue(rawTuning, ioState_.tuning, skippedValues.tuning, isWarmingUp, 20);
-    processAnalogValue(rawBrightness, ioState_.brightness, skippedValues.brightness, isWarmingUp, 20);
+    processAnalogValue(rawVolume, ioState_.volume, isWarmingUp);
+    processAnalogValue(rawTone, ioState_.tone, isWarmingUp);
+    processAnalogValue(rawTuning, ioState_.tuning, isWarmingUp);
+    processAnalogValue(rawBrightness, ioState_.brightness, isWarmingUp);
 
     // Process buttons and store other values...
     ioState_.buttonStates = newButtons;
-    ioState_.fmValue = newFmValue; // TODO: debounce/process?
-    // ioState_.control = newControl;
-    //ioState_.controlProcessed = false; // Mark new control as unprocessed
+    ioState_.fmValue = newFmValue;
 
     return true;
   }

@@ -133,8 +133,8 @@ void AudioModeControllerNFCPlayer::setMixerGains()
   auto *fftInput = audio.getFFTInputMixer();
 
   main->gain(0, 0.0); // BT or radio audio
-  main->gain(1, 0.5); // SD card audio L
-  main->gain(2, 0.5); // SD card audio R
+  main->gain(1, 0.4); // SD card audio L
+  main->gain(2, 0.4); // SD card audio R
   main->gain(3, 0.0); // In memory audio
 
   fftInput->gain(0, 1.0); // BT/SD/Radio source
@@ -144,6 +144,6 @@ void AudioModeControllerNFCPlayer::setMixerGains()
 void AudioModeControllerNFCPlayer::configureCodec()
 {
   auto *codec = audio.getCodec();
-  codec->volume(0.6);
+  codec->volume(0.65);
   codec->enhanceBassEnable();
 }

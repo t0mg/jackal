@@ -46,7 +46,8 @@ void Display::handleSplashScreen()
   static unsigned long lastUpdateTime = 0;
   unsigned long currentTime = millis() - splashStartTime;
   unsigned long updateDelta = millis() - lastUpdateTime;
-
+  static uint8_t subtitleAlpha = 0;
+  
   if (updateDelta >= 16)
   { // ~60fps
     lastUpdateTime = millis();
@@ -57,45 +58,49 @@ void Display::handleSplashScreen()
     const unsigned long redStart = 200;
     const unsigned long titleStart = 2300;
     const unsigned long subtitleStart = 3300;
-    const unsigned long animationEnd = 4000;
+    const unsigned long fadeOutStart = 5000;
+    const unsigned long animationEnd = 5800;
 
     // Alpha fade speed
     const uint8_t fadeSpeed = 16;
-
-    // Cyan parts - simple fade in
-    if (currentTime >= cyanStart)
-    {
-      cyanAlpha = min(255, cyanAlpha + fadeSpeed);
-    }
-
-    // Red parts - simple fade in
-    if (currentTime >= redStart)
-    {
-      redAlpha = min(255, redAlpha + fadeSpeed);
-    }
-
-    // Title text - simple fade in
-    if (currentTime >= titleStart)
-    {
-      textAlpha = min(255, textAlpha + fadeSpeed);
-    }
-
-    // Subtitle text - one blink
-    static uint8_t subtitleAlpha = 0;
-    if (currentTime >= subtitleStart)
-    {
-      unsigned long subtitleTime = currentTime - subtitleStart;
-      if (subtitleTime < 200)
-      { // Initial fade in
-        subtitleAlpha = min(255, subtitleAlpha + fadeSpeed);
+    
+    if (currentTime >= fadeOutStart) {
+      cyanAlpha = max(0, cyanAlpha - 64);
+      redAlpha = max(0, redAlpha - 64);
+      textAlpha = max(0, textAlpha - 64);
+      subtitleAlpha = max(0, subtitleAlpha - 64);
+    } else {
+      if (currentTime >= cyanStart)
+      {
+        cyanAlpha = min(255, cyanAlpha + fadeSpeed);
       }
-      else if (subtitleTime < 300)
-      { // Quick fade out
-        subtitleAlpha = max(0, subtitleAlpha - fadeSpeed);
+      
+      if (currentTime >= redStart)
+      {
+        redAlpha = min(255, redAlpha + fadeSpeed);
       }
-      else
-      { // Final fade in
-        subtitleAlpha = min(255, subtitleAlpha + fadeSpeed);
+      
+      if (currentTime >= titleStart)
+      {
+        textAlpha = min(255, textAlpha + fadeSpeed);
+      }
+
+      // Subtitle text - one blink
+      if (currentTime >= subtitleStart)
+      {
+        unsigned long subtitleTime = currentTime - subtitleStart;
+        if (subtitleTime < 200)
+        { // Initial fade in
+          subtitleAlpha = min(255, subtitleAlpha + fadeSpeed);
+        }
+        else if (subtitleTime < 300)
+        { // Quick fade out
+          subtitleAlpha = max(0, subtitleAlpha - fadeSpeed);
+        }
+        else
+        { // Final fade in
+          subtitleAlpha = min(255, subtitleAlpha + fadeSpeed);
+        }
       }
     }
 

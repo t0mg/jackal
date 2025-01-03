@@ -73,32 +73,6 @@ void setMTPdeviceChecks(bool enable)
   }
 }
 
-// void setMixerGains()
-// {
-//   bool bluetoothActive = currentMode == MODE_BLUETOOTH;
-//   bool radioActive = currentMode == MODE_RADIO;
-//   bool sdActive = currentMode == MODE_SD_PLAYBACK;
-//   bool recorderActive = currentMode == MODE_SD_RECORDER;
-//   audioSystem.getCodec()->volume(sdActive ? 1.0 : 0.8);
-//   audioSystem.getCodec()->inputSelect(bluetoothActive || radioActive ? AUDIO_INPUT_LINEIN : AUDIO_INPUT_MIC);
-//   audioSystem.getCodec()->lineInLevel(8); // 0 to 15
-//   audioSystem.getCodec()->micGain(20);
-//   if (sdActive || recorderActive)
-//     audioSystem.getCodec()->enhanceBassDisable();
-//   else
-//     audioSystem.getCodec()->enhanceBassEnable();
-//   audioSystem.getMonoDownmixer()->gain(0, bluetoothActive ? 0.9 : 0.0);         // BT audio L
-//   audioSystem.getMonoDownmixer()->gain(1, bluetoothActive ? 0.1 : 0.0);         // BT audio R
-//   audioSystem.getMonoDownmixer()->gain(2, radioActive ? 0.5 : 0.0);             // Radio audio L
-//   audioSystem.getMonoDownmixer()->gain(3, radioActive ? 0.5 : 0.0);             // Radio audio R
-//   audioSystem.getMainMixer()->gain(0, bluetoothActive || radioActive ? 1.0 : 0.0); // BT or radio audio
-//   audioSystem.getMainMixer()->gain(1, sdActive ? 0.5 : 0.0);                       // SD card audio L
-//   audioSystem.getMainMixer()->gain(2, sdActive ? 0.5 : 0.0);                       // SD card audio R
-//   audioSystem.getMainMixer()->gain(3, 1.0);                                        // In memory audio
-//   audioSystem.getFFTInputMixer()->gain(0, recorderActive ? 0.0 : 1.0);             // BT/SD/Radio source
-//   audioSystem.getFFTInputMixer()->gain(1, recorderActive ? 1.0 : 0.0);             // Mic source
-// }
-
 AudioMode computeMode(bool inputButtonPressed, bool bandButtonPressed)
 {
   LOGF("Input button: %d, Band button: %d\n", inputButtonPressed, bandButtonPressed);
@@ -299,15 +273,14 @@ void setup()
     // Normal boot sequence
     LOG("Start boot animation");
     analogWrite(PIN_BRIGHTNESS, 240);
-    audioSystem.getOutputAmp()->gain(0.02);
+    audioSystem.getOutputAmp()->gain(0.04);
     audioSystem.getMemoryPlayer()->play(boot_sound);
     audioSystem.getBitcrusher()->bits(14);
     audioSystem.getBitcrusher()->sampleRate(5512);
     display.drawSplash();
-    delay(900);
 
     elapsedMillis splashTimer = 0;
-    while (splashTimer < 5300)
+    while (splashTimer < 5800) // animationEnd in Display.cpp
     {
       display.update();
       yield();
@@ -401,7 +374,10 @@ void loop()
       SNVS_LPGPR1 = now();
     }
 
-    if (currentPeak && currentPeak->available())
+    if (i2c.getIOState().volume == 0 && audioController->getMode() != MODE_SD_RECORDER)
+    { 
+      analogWrite(PIN_VUMETER, 0);
+    } else if (currentPeak && currentPeak->available())
     {
       // Modified VU meter curve (Gaussian) to be more sensitive to lower values.
       float mean = 0.7;  // Lower mean to shift sensitivity curve left
@@ -411,8 +387,6 @@ void loop()
       int monoPeak = min(val * 25.0, 255);
       analogWrite(PIN_VUMETER, monoPeak);
     }
-
-    // audioSystem.getCodec()->eqBands(bandValues[0], bandValues[1], bandValues[2], bandValues[3], bandValues[4]);
 
     float tonePotVal = map((float)i2c.getIOState().tone, 0.f, 255.f, 0.f, 1.f);
     int mappedVal = getMappedValue(tonePotVal, BIT_DEPTHS, BIT_DEPTHS_LENGTH);

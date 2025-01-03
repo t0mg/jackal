@@ -16,14 +16,13 @@ public:
         recorder(recorder)
   {
     // https://rgbcolorpicker.com/565
-    // https://lospec.com/palette-list/technobike
-    theme.clockColor = 0x158f; // ILI9341_BLUE;
-    theme.fftFront = 0x0f6b; // ILI9341_CYAN;
-    theme.fftBack = 0x2b0d; // ILI9341_BLUE;
-    theme.fftMain = 0x0f6b; // ILI9341_PINK;
-    theme.metadataLine1 = 0x0f6b; // ILI9341_PINK;
-    theme.metadataLine2 = 0x158f; // ILI9341_PINK;
-    theme.modeTitle = 0x0f6b; // ILI9341_PINK;
+    theme.clockColor = 0x1589;
+    theme.fftFront = 0x0f6b;
+    theme.fftBack = 0x2b0d;
+    theme.fftMain = 0x0f6b;
+    theme.metadataLine1 = 0x0f6b;
+    theme.metadataLine2 = 0x1589;
+    theme.modeTitle = 0x0f6b;
   }
 
   AudioMode getMode() override
