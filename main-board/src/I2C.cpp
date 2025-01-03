@@ -229,7 +229,7 @@ bool I2C::requestDataFromIO(bool isRetry)
     newNfcUidString.toUpperCase();  // Convert to uppercase for consistency
 
     if (newNfcUidString != ioState_.nfcUidString) {
-        if (newNfcUidString == "000000000000FF" || newNfcUidString == "00000000000000") {  // No tag detected
+        if (newNfcUidString == "000000000000FF" || newNfcUidString == "00000000000000" || newNfcUidString == "F1000000000000") {  // No tag detected / spurious codes
             if (!noTagTimerStarted) {
                 noTagTimer = 0;
                 noTagTimerStarted = true;

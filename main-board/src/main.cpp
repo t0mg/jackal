@@ -28,6 +28,7 @@
 #include "AudioModeControllerSDPlayer.h"
 #include "AudioModeControllerSDRecorder.h"
 #include "AudioModeControllerNFCPlayer.h"
+#include "AudioModeControllerTimeSetup.h"
 
 #define PIN_VUMETER 14
 #define PIN_BRIGHTNESS 2
@@ -50,8 +51,7 @@ Recorder recorder(*audioSystem.getWavPlayer(), *audioSystem.getRecordQueue());
 AudioModeControllerNull nullController(audioSystem);
 AudioModeController *audioController = &nullController;
 
-elapsedMillis orangeButtonTimer = 0;
-bool orangeButtonPressed = false;
+bool needsTimeSetup = false;
 
 time_t getTeensy3Time()
 {
@@ -90,6 +90,19 @@ AudioMode computeMode(bool inputButtonPressed, bool bandButtonPressed)
 
 void updateMode(AudioMode newMode)
 {
+  // Check if time setup is complete
+  if (audioController->getMode() == MODE_TIME_SETUP)
+  {
+    AudioModeControllerTimeSetup *timeSetup = (AudioModeControllerTimeSetup *)audioController;
+    needsTimeSetup = !timeSetup->isTimeSetComplete();
+  }
+
+  if (needsTimeSetup && newMode != MODE_TIME_SETUP)
+  {
+    LOG("Time setup is required, ignoring mode switch");
+    return;
+  }
+
   AudioMode currentMode = audioController->getMode();
   LOGF("Update mode, currentMode: %d, newMode: %d\n", currentMode, newMode);
 
@@ -138,6 +151,9 @@ void updateMode(AudioMode newMode)
     break;
   case MODE_NFC_PLAYBACK:
     audioController = new AudioModeControllerNFCPlayer(display, i2c, audioSystem, recorder);
+    break;
+  case MODE_TIME_SETUP:
+    audioController = new AudioModeControllerTimeSetup(display, i2c, audioSystem);
     break;
   default:
     audioController = &nullController;
@@ -224,17 +240,15 @@ void setup()
   LOG("Setup time provider");
   setSyncProvider(getTeensy3Time);
 
-  if (timeStatus() != timeSet)
+  if (timeStatus() != timeSet || (hour() == 0 && minute() == 0 && day() == 1 && month() == 1))
   {
-    // Set a default time if RTC isn't valid
-    setTime(0, 0, 0, 1, 1, 2024); // 00:00:00 January 1, 2024
-    Teensy3Clock.set(now());      // Set the RTC
-    LOG("RTC was invalid - set to default time");
+    LOG("RTC was invalid - will display time setup screen");
+    needsTimeSetup = true;
   }
 
   bool rtcValid = (timeStatus() == timeSet);
-  // Only check quick boot if RTC is valid
-  bool quickBoot = rtcValid && (now() - SNVS_LPGPR1) < QUICK_BOOT_THRESHOLD;
+  // Only check quick boot if RTC is valid and time isn't 00:00
+  bool quickBoot = rtcValid && !needsTimeSetup && (now() - SNVS_LPGPR1) < QUICK_BOOT_THRESHOLD;
 
   LOGF("RTC valid: %d, Quick boot: %d, last update: %d, now: %d\n",
        rtcValid, quickBoot, SNVS_LPGPR1, now());
@@ -316,15 +330,22 @@ void setup()
   MTP.addFilesystem(SD, "Media");
   mtpCheckTime = MTP.storage()->get_DeltaDeviceCheckTimeMS();
 
-  // Read IO state after I2C is fully initialized
-  IOState initialState = i2c.getIOState();
-  bool bandPressed = initialState.buttonStates & BAND_BTN;
-  bool inputPressed = initialState.buttonStates & INPUT_BTN;
+  if (needsTimeSetup)
+  {
+    updateMode(MODE_TIME_SETUP);
+  }
+  else
+  {
+    // Read IO state after I2C is fully initialized
+    IOState initialState = i2c.getIOState();
+    bool bandPressed = initialState.buttonStates & BAND_BTN;
+    bool inputPressed = initialState.buttonStates & INPUT_BTN;
 
-  LOGF("Initial button states - Input: %d, Band: %d\n", inputPressed, bandPressed);
+    LOGF("Initial button states - Input: %d, Band: %d\n", inputPressed, bandPressed);
 
-  updateMode(computeMode(inputPressed, bandPressed));
-  LOGF("Initial mode set to: %d\n", audioController->getMode());
+    updateMode(computeMode(inputPressed, bandPressed));
+    LOGF("Initial mode set to: %d\n", audioController->getMode());
+  }
 
   LOG("Attach callbacks");
   i2c.setOrangeButtonCallback(onOrangeButton);
@@ -367,7 +388,7 @@ void loop()
     audioController->updateOutputVolume();
     analogWrite(PIN_BRIGHTNESS, i2c.getIOState().brightness);
     // Update clock every 300ms
-    if (clockTimer >= 300)
+    if (clockTimer >= 300 && !needsTimeSetup)
     {
       clockTimer = 0;
       display.updateClock();
@@ -375,9 +396,10 @@ void loop()
     }
 
     if (i2c.getIOState().volume == 0 && audioController->getMode() != MODE_SD_RECORDER)
-    { 
+    {
       analogWrite(PIN_VUMETER, 0);
-    } else if (currentPeak && currentPeak->available())
+    }
+    else if (currentPeak && currentPeak->available())
     {
       // Modified VU meter curve (Gaussian) to be more sensitive to lower values.
       float mean = 0.7;  // Lower mean to shift sensitivity curve left
@@ -395,7 +417,7 @@ void loop()
     audioSystem.getBitcrusher()->bits(mappedVal);
     audioSystem.getBitcrusher()->sampleRate(mappedVal2);
 
-    if (fft.available())
+    if (!needsTimeSetup && fft.available())
     {
       display.clearMainArea();
       display.tft.setClipRect(0, 40, 320, 140);

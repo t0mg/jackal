@@ -111,6 +111,11 @@ The system implements different audio modes through a set of controller classes 
    - Manages playlist browsing
    - Shows track info
 
+6. **Time Setup Mode** (`AudioModeControllerTimeSetup`)
+   - Not really an audio mode :)
+   - Sets the time of the Teensy 4.0 RTC
+   - Will block other modes until setup is complete
+
 ### Development
 
 This project uses PlatformIO for development. Key files:
