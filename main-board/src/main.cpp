@@ -15,10 +15,9 @@
 #include "Display.h"
 #include "I2C.h"
 #include "AudioMode.h"
-// #include "async_input.h"
-// #include "input_i2s2_16bit.h"
 #include "Recorder.h"
 #include "sound/boot_sound.h"
+#include "sound/boop.h"
 #include "sprites/hold_to_record.h"
 #include "AudioSystem.h"
 #include "AudioModeController.h"
@@ -200,6 +199,10 @@ void onOrangeButton(bool pressed)
 {
   LOG("Orange button ");
   LOG(pressed ? "pressed" : "released");
+  if (pressed)
+  {
+    audioSystem.getMemoryPlayer()->play(boop);
+  }
   audioController->handleOrangeButton(pressed);
 }
 

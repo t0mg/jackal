@@ -44,6 +44,7 @@ void AudioModeControllerSDRecorder::handleOrangeButton(bool pressed)
   }
   else
   {
+    playBeep();
     recorder.stopRecording();
     display.setTemporaryMetadata("Recording stopped", "Saved to memory", 3000);
   }
@@ -63,7 +64,7 @@ void AudioModeControllerSDRecorder::setMixerGains()
   main->gain(0, 0.0); // BT or radio audio
   main->gain(1, 0.0); // SD card audio L
   main->gain(2, 0.0); // SD card audio R
-  main->gain(3, 0.0); // In memory audio
+  main->gain(3, 0.4); // In memory audio
 
   fftInput->gain(0, 0.0); // BT/SD/Radio source
   fftInput->gain(1, 1.0); // Mic source
@@ -78,11 +79,11 @@ void AudioModeControllerSDRecorder::configureCodec()
   codec->enhanceBassDisable();
 }
 
-void AudioModeControllerSDRecorder::updateOutputVolume()
-{
-  // Always mute output in recorder mode to prevent feedback
-  audio.getOutputAmp()->gain(0);
-}
+// void AudioModeControllerSDRecorder::updateOutputVolume()
+// {
+//   // Always mute output in recorder mode to prevent feedback
+//   audio.getOutputAmp()->gain(0);
+// }
 
 AudioAnalyzePeak *AudioModeControllerSDRecorder::getPeak()
 {

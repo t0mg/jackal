@@ -45,6 +45,7 @@ void AudioModeControllerRadio::frameLoop()
     orangeButtonPressed = false; // Reset to prevent multiple saves
     SNVS_LPGPR2 = SNVS_LPGPR0;          // Save current frequency
     display.setTemporaryMetadata("Favorite saved", "Short press to load", 3000);
+    playBeep();
   }
 }
 
@@ -115,7 +116,7 @@ void AudioModeControllerRadio::setMixerGains()
   main->gain(0, 1.0); // Radio audio
   main->gain(1, 0.0); // SD card audio L
   main->gain(2, 0.0); // SD card audio R
-  main->gain(3, 0.0); // In memory audio
+  main->gain(3, 0.5); // In memory audio
 
   fftInput->gain(0, 1.0); // BT/SD/Radio source
   fftInput->gain(1, 0.0); // Mic source

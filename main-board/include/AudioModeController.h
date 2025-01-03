@@ -4,6 +4,7 @@
 #include "I2C.h"
 #include "AudioSystem.h"
 #include "AudioMode.h"
+#include "sound/beep.h"
 
 class AudioModeController
 {
@@ -35,4 +36,5 @@ public:
   virtual void configureCodec();
   virtual AudioAnalyzePeak *getPeak();
   virtual AudioModeTheme& getTheme() { return theme; }
+  virtual void playBeep() { audio.getMemoryPlayer()->play(beep); }
 };

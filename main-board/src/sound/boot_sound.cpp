@@ -1,4 +1,6 @@
 // Audio data converted from audio file by wav2sketch_js
+// https://github.com/PaulStoffregen/Audio/tree/master/extras/wav2sketch
+// https://codepen.io/t0m/pen/YzmgvVr
 
 #include "boot_sound.h"
 

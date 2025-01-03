@@ -36,6 +36,6 @@ public:
   void handleControl(ControlCommand cmd) override;
   void setMixerGains() override;
   void configureCodec() override;
-  void updateOutputVolume() override;
+  // void updateOutputVolume() override;
   AudioAnalyzePeak *getPeak() override;
 };

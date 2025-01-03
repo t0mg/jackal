@@ -108,7 +108,7 @@ void AudioModeControllerBluetooth::setMixerGains()
   main->gain(0, 1.0); // BT audio
   main->gain(1, 0.0); // SD card audio L
   main->gain(2, 0.0); // SD card audio R
-  main->gain(3, 0.0); // In memory audio
+  main->gain(3, 0.6); // In memory audio
 
   fftInput->gain(0, 1.0); // BT/SD/Radio source
   fftInput->gain(1, 0.0); // Mic source

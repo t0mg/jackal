@@ -6,7 +6,7 @@ void AudioModeController::setMixerGains()
   main->gain(0, 0.0); // BT or radio audio
   main->gain(1, 0.0); // SD card audio L
   main->gain(2, 0.0); // SD card audio R
-  main->gain(3, 1.0); // In memory audio
+  main->gain(3, 0.4); // In memory audio
 }
 
 void AudioModeController::updateOutputVolume()

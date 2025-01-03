@@ -34,6 +34,7 @@ void AudioModeControllerSDPlayer::frameLoop()
     orangeButtonPressed = false; // Reset to prevent multiple deletes
     if (recorder.deleteCurrentFile())
     {
+      playBeep();
       display.setTemporaryMetadata((char *)"File", (char *)"Deleted", 3000);
       display.update();
       delay(2000);
@@ -112,7 +113,7 @@ void AudioModeControllerSDPlayer::setMixerGains()
   main->gain(0, 0.0); // BT or radio audio
   main->gain(1, 0.5); // SD card audio L
   main->gain(2, 0.5); // SD card audio R
-  main->gain(3, 0.0); // In memory audio
+  main->gain(3, 0.3); // In memory audio
 
   fftInput->gain(0, 1.0); // BT/SD/Radio source
   fftInput->gain(1, 0.0); // Mic source

@@ -16,6 +16,7 @@ void AudioModeControllerNFCPlayer::enter()
 
   if (nfcFolderFound)
   {
+    playBeep();
     recorder.setBasePath(path);
     recorder.seekToFirstFile();
     recorder.play();
@@ -24,6 +25,7 @@ void AudioModeControllerNFCPlayer::enter()
 
 void AudioModeControllerNFCPlayer::exit()
 {
+  playBeep();
   recorder.stopPlaying();
 }
 
@@ -135,7 +137,7 @@ void AudioModeControllerNFCPlayer::setMixerGains()
   main->gain(0, 0.0); // BT or radio audio
   main->gain(1, 0.4); // SD card audio L
   main->gain(2, 0.4); // SD card audio R
-  main->gain(3, 0.0); // In memory audio
+  main->gain(3, 0.4); // In memory audio
 
   fftInput->gain(0, 1.0); // BT/SD/Radio source
   fftInput->gain(1, 0.0); // Mic source

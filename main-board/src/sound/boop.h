@@ -6,4 +6,4 @@
 
 #include <Arduino.h>
 
-extern const unsigned int boot_sound[6593];
+extern const unsigned int boop[913];

@@ -189,7 +189,12 @@ void AudioModeControllerTimeSetup::frameLoop()
 void AudioModeControllerTimeSetup::handleOrangeButton(bool pressed)
 {
   if (!pressed)
+  {
+    if (timeSetComplete) {
+      playBeep();
+    }
     return; // Only handle button release
+  }
 
   switch (currentStage)
   {
