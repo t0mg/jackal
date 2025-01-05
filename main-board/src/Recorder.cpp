@@ -190,156 +190,8 @@ void Recorder::playFile(const char *filename)
   lastSDOperation = millis();
 }
 
-// bool Recorder::seekFile(bool older, bool jumpToEnd)
-// {
-//   lastSDOperation = millis();
-//   File dir = SD.open(basePath.c_str());
-//   if (!dir)
-//   {
-//     return false;
-//   }
-
-//   const int MAX_FILES = 100;
-//   char *fileList[MAX_FILES];
-//   int numFiles = listSortedFiles(fileList, MAX_FILES);
-
-//   // Print sorted files
-//   for (int i = 0; i < numFiles; i++)
-//   {
-//     Serial.println(fileList[i]);
-//   }
-
-//   // Clean up
-//   for (int i = 0; i < numFiles; i++)
-//   {
-//     free(fileList[i]);
-//   }
-
-//   char bestMatch[255] = "";
-//   char newestFile[255] = "";
-//   char oldestFile[255] = "";
-//   bool foundCurrent = false;
-
-//   // First pass: find current file and track newest/oldest files
-//   while (File entry = dir.openNextFile())
-//   {
-//     if (!entry.isDirectory() &&
-//         (strstr(entry.name(), ".WAV") || strstr(entry.name(), ".wav")))
-//     {
-//       // Keep track of the chronological first (newest) and last (oldest) files
-//       if (newestFile[0] == '\0' || strcmp(entry.name(), newestFile) > 0)
-//       {
-//         strncpy(newestFile, entry.name(), sizeof(newestFile) - 1);
-//       }
-//       if (oldestFile[0] == '\0' || strcmp(entry.name(), oldestFile) < 0)
-//       {
-//         strncpy(oldestFile, entry.name(), sizeof(oldestFile) - 1);
-//       }
-
-//       if (strcmp(entry.name(), currentFilename) == 0)
-//       {
-//         foundCurrent = true;
-//       }
-//       entry.close();
-//     }
-//   }
-
-//   if (jumpToEnd || !foundCurrent)
-//   {
-//     if (older)
-//     {
-//       strncpy(currentFilename, oldestFile, sizeof(currentFilename));
-//       currentFilename[sizeof(currentFilename) - 1] = '\0';
-//       return oldestFile[0] != '\0'; // Return true if we found any files
-//     }
-//     else
-//     {
-//       strncpy(currentFilename, newestFile, sizeof(currentFilename));
-//       currentFilename[sizeof(currentFilename) - 1] = '\0';
-//       return newestFile[0] != '\0'; // Return true if we found any files
-//     }
-//   }
-
-//   // // If we're not currently playing anything, return the newest file
-//   // if (!foundCurrent)
-//   // {
-//   //   strncpy(currentFilename, newestFile, sizeof(currentFilename));
-//   //   currentFilename[sizeof(currentFilename) - 1] = '\0';
-//   //   return newestFile[0] != '\0'; // Return true if we found any files
-//   // }
-
-//   // Reset directory
-//   dir.rewindDirectory();
-
-//   // Second pass: find target file
-//   while (File entry = dir.openNextFile())
-//   {
-//     if (!entry.isDirectory() && (strstr(entry.name(), ".WAV") || strstr(entry.name(), ".wav")))
-//     {
-//       if (older)
-//       {
-//         // Looking for next older file (lower timestamp)
-//         if (strcmp(entry.name(), currentFilename) < 0 &&
-//             (bestMatch[0] == '\0' || strcmp(entry.name(), bestMatch) > 0))
-//         {
-//           strncpy(bestMatch, entry.name(), sizeof(bestMatch));
-//           bestMatch[sizeof(bestMatch) - 1] = '\0';
-//         }
-//       }
-//       else
-//       {
-//         // Looking for next newer file (higher timestamp)
-//         if (strcmp(entry.name(), currentFilename) > 0 &&
-//             (bestMatch[0] == '\0' || strcmp(entry.name(), bestMatch) < 0))
-//         {
-//           strncpy(bestMatch, entry.name(), sizeof(bestMatch));
-//           bestMatch[sizeof(bestMatch) - 1] = '\0';
-//         }
-//       }
-//       entry.close();
-//     }
-//   }
-//   dir.close();
-
-//   // Handle wrap-around
-//   if (bestMatch[0] == '\0')
-//   {
-//     if (older)
-//     { // If seeking older and no older files, wrap to newest
-//       strncpy(bestMatch, newestFile, sizeof(bestMatch));
-//       bestMatch[sizeof(bestMatch) - 1] = '\0';
-//     }
-//     else
-//     { // If seeking newer and no newer files, wrap to oldest
-//       strncpy(bestMatch, oldestFile, sizeof(bestMatch));
-//       bestMatch[sizeof(bestMatch) - 1] = '\0';
-//     }
-//   }
-
-//   if (bestMatch[0] != '\0')
-//   {
-//     strncpy(currentFilename, bestMatch, sizeof(currentFilename));
-//     currentFilename[sizeof(currentFilename) - 1] = '\0';
-//     return true;
-//   }
-
-//   return false;
-// }
-
 void Recorder::playAdjacentFile(bool previous, bool wrap)
 {
-  // Stop current playback first
-  // if (isPlaying())
-  // {
-  //   stopPlaying();
-  //   // Wait for cooldown after stopping
-  //   elapsedMillis cooldownTimer = 0;
-  //   while (cooldownTimer < SD_COOLDOWN_MS)
-  //   {
-  //     yield();
-  //   }
-  // }
-
   LOG_RECORDER_MSGF("Seek, from file: %s", currentFilename);
   if (seek(previous, wrap))
   {
@@ -559,41 +411,67 @@ bool Recorder::seek(bool previous, bool wrap)
   const int MAX_FILES = 100;
   char *fileList[MAX_FILES];
   int numFiles = listSortedFiles(fileList, MAX_FILES);
+  bool success = false;
 
   if (numFiles == 0)
   {
     return false;
   }
 
-  // Find current file index
-  int currentIndex = -1;
-  for (int i = 0; i < numFiles; i++)
+  // If no current file, start with first/last based on reverseAlphabeticalOrder
+  if (currentFilename[0] == '\0')
   {
-    if (strcmp(fileList[i], currentFilename) == 0)
-    {
-      currentIndex = i;
-      break;
-    }
-  }
-
-  // Get next (or previous) file
-  int nextIndex = currentIndex + (previous ? -1 : 1) * (reverseAlphabeticalOrder ? -1 : 1);
-  LOG_RECORDER_MSGF("current: %d, nextIndex: %d", currentIndex, nextIndex);
-  bool success = false;
-  if (nextIndex < 0 || nextIndex >= numFiles)
-  {
-    if (wrap)
-    {
-      strncpy(currentFilename, fileList[reverseAlphabeticalOrder ? numFiles - 1 : 0], sizeof(currentFilename));
-      currentFilename[sizeof(currentFilename) - 1] = '\0';
-      success = true;
-    }
+    int startIndex = reverseAlphabeticalOrder ? (numFiles - 1) : 0;
+    strncpy(currentFilename, fileList[startIndex], sizeof(currentFilename));
+    currentFilename[sizeof(currentFilename) - 1] = '\0';
+    success = true;
   }
   else
   {
-    strncpy(currentFilename, fileList[nextIndex], sizeof(currentFilename));
-    currentFilename[sizeof(currentFilename) - 1] = '\0';
-    success = true;
+    // Find current file index
+    int currentIndex = -1;
+    for (int i = 0; i < numFiles; i++)
+    {
+      if (strcmp(fileList[i], currentFilename) == 0)
+      {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    // Calculate next index based on direction and order
+    int nextIndex;
+    if (reverseAlphabeticalOrder)
+    {
+      // In reverse mode:
+      // - "next" means going towards index 0 (start of list)
+      // - "previous" means going towards numFiles-1 (end of list)
+      nextIndex = currentIndex + (previous ? 1 : -1);
+    }
+    else
+    {
+      // In normal mode:
+      // - "next" means going towards numFiles-1 (end of list)
+      // - "previous" means going towards 0 (start of list)
+      nextIndex = currentIndex + (previous ? -1 : 1);
+    }
+
+    if (nextIndex < 0 || nextIndex >= numFiles)
+    {
+      if (wrap)
+      {
+        nextIndex = nextIndex < 0 ? numFiles - 1 : 0;
+        strncpy(currentFilename, fileList[nextIndex], sizeof(currentFilename));
+        currentFilename[sizeof(currentFilename) - 1] = '\0';
+        success = true;
+      }
+    }
+    else
+    {
+      strncpy(currentFilename, fileList[nextIndex], sizeof(currentFilename));
+      currentFilename[sizeof(currentFilename) - 1] = '\0';
+      success = true;
+    }
   }
 
   // Clean up

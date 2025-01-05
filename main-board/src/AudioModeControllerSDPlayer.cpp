@@ -72,7 +72,7 @@ void AudioModeControllerSDPlayer::handleControl(ControlCommand cmd)
   switch (cmd)
   {
   case PREV:
-    recorder.playPrevFile();
+    recorder.playPrevFile(true);
     break;
   case PLAY:
     if (recorder.isPlaying())
@@ -98,7 +98,7 @@ void AudioModeControllerSDPlayer::handleControl(ControlCommand cmd)
     }
     break;
   case NEXT:
-    recorder.playNextFile();
+    recorder.playNextFile(true);
     break;
   default:
     break;
