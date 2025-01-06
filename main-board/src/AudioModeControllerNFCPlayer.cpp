@@ -5,9 +5,8 @@ void AudioModeControllerNFCPlayer::enter()
   updateOutputVolume();
   setMixerGains();
   configureCodec();
+  setDisplayTheme();
   i2c.setCurrentMode(MODE_NFC_PLAYBACK);
-  display.setTheme(theme);
-  display.setModeTitle("NFC Player");
   currentFolder = i2c.getIOState().nfcUidString.c_str();
   recorder.setReverseAlphabeticalOrder(false);
 

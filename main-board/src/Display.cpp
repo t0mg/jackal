@@ -3,7 +3,7 @@
 #include <TimeLib.h>
 #include "font/neuropolitical_10.h" // made with https://www.pjrc.com/ili9341_t3-font-editor/ and Neuropolitical font
 #include "font/neuropolitical_12.h"
-#include "sprites/hold_to_record.h" // TODO: Unused for now, remove or update
+#include "sprites/sprites.h"
 #include "Log.h"
 
 DMAMEM uint16_t _fb1[320 * 240];
@@ -47,7 +47,7 @@ void Display::handleSplashScreen()
   unsigned long currentTime = millis() - splashStartTime;
   unsigned long updateDelta = millis() - lastUpdateTime;
   static uint8_t subtitleAlpha = 0;
-  
+
   if (updateDelta >= 16)
   { // ~60fps
     lastUpdateTime = millis();
@@ -63,23 +63,26 @@ void Display::handleSplashScreen()
 
     // Alpha fade speed
     const uint8_t fadeSpeed = 16;
-    
-    if (currentTime >= fadeOutStart) {
+
+    if (currentTime >= fadeOutStart)
+    {
       cyanAlpha = max(0, cyanAlpha - 64);
       redAlpha = max(0, redAlpha - 64);
       textAlpha = max(0, textAlpha - 64);
       subtitleAlpha = max(0, subtitleAlpha - 64);
-    } else {
+    }
+    else
+    {
       if (currentTime >= cyanStart)
       {
         cyanAlpha = min(255, cyanAlpha + fadeSpeed);
       }
-      
+
       if (currentTime >= redStart)
       {
         redAlpha = min(255, redAlpha + fadeSpeed);
       }
-      
+
       if (currentTime >= titleStart)
       {
         textAlpha = min(255, textAlpha + fadeSpeed);
@@ -140,8 +143,8 @@ void Display::updateClock()
   String timeString = (hour() < 10 ? "0" : "") + (String)hour() + ":" + (minute() < 10 ? "0" : "") + (String)minute();
   tft.setFont(neuropolitical_12);
   tft.setTextSize(2);
-  tft.fillRect(240, 20, 120, 20, ILI9341_BLACK);
-  tft.setCursor(240, 20);
+  tft.fillRect(245, 17, 120, 20, ILI9341_BLACK);
+  tft.setCursor(245, 17);
   tft.setTextColor(theme.clockColor);
   tft.print(timeString);
 }
@@ -322,18 +325,6 @@ void Display::setMetadata(const char *textBig, const char *textSmall)
   clampAndPrint(smallBuffer, 28);
 }
 
-void Display::setModeTitle(const char *modeText)
-{
-  clear();
-  LOG_DISPLAY_MSG(modeText);
-  tft.setFont(neuropolitical_10);
-  tft.setTextSize(2);
-  // tft.fillRect(20, 20, 140, 20, ILI9341_BLACK);
-  tft.setCursor(20, 20);
-  tft.setTextColor(theme.modeTitle);
-  tft.print(modeText);
-}
-
 void Display::drawSplash()
 {
   splashStartTime = millis();
@@ -394,9 +385,42 @@ void Display::clear()
   tft.fillScreen(ILI9341_BLACK);
 }
 
-void Display::drawHoldToRecord()
+void Display::drawModeTitle(AudioMode mode)
 {
-  tft.writeRect(187, 229, 135, 11, (uint16_t *)hold_to_record);
+  static int frameLeft = 18;
+  static int frameTop = 18;
+  static int frameHeight = 17;
+  static int imageLeft = frameLeft + 5;
+  static int imageTop = frameTop + 4;
+  static int imageHeight = 9;
+
+  tft.fillRect(frameLeft, frameTop, 160, frameHeight, ILI9341_BLACK);
+  switch (mode)
+  {
+  case MODE_BLUETOOTH:
+    tft.drawRect(frameLeft, frameTop, 109, frameHeight, theme.modeTitle);
+    tft.drawBitmap(imageLeft, imageTop, image_bluetooth_bits, 99, imageHeight, theme.modeTitle);
+    break;
+  case MODE_RADIO:
+    tft.drawRect(frameLeft, frameTop, 59, frameHeight, theme.modeTitle);
+    tft.drawBitmap(imageLeft, imageTop, image_radio_bits, 49, imageHeight, theme.modeTitle);
+    break;
+  case MODE_SD_PLAYBACK:
+    tft.fillRect(frameLeft, frameTop, 76, frameHeight, theme.modeTitle);
+    tft.drawBitmap(imageLeft, imageTop, image_player_bits, 66, imageHeight, ILI9341_BLACK);
+    break;
+  case MODE_SD_RECORDER:
+    tft.fillRect(frameLeft, frameTop, 98, frameHeight, theme.modeTitle);
+    tft.drawBitmap(imageLeft, imageTop, image_recorder_bits, 88, imageHeight, ILI9341_BLACK);
+    break;
+  case MODE_NFC_PLAYBACK:
+    tft.drawRect(frameLeft, frameTop, 43, frameHeight, theme.modeTitle);
+    tft.drawBitmap(imageLeft, imageTop, image_nfc_bits, 33, imageHeight, theme.modeTitle);
+    tft.drawBitmap(66, 63, image_music_record_bits, 15, 16, theme.modeTitle);
+    break;
+  default:
+    break;
+  }
 }
 
 void Display::setTemporaryMetadata(const char *line1, const char *line2, unsigned long duration)
@@ -423,4 +447,30 @@ void Display::clearTemporaryMetadata()
 bool Display::hasTemporaryMetadata() const
 {
   return temporaryMetadataActive && (tempMetadataTimer < tempMetadataTimeout);
+}
+
+void Display::drawBtIcon(bool connected)
+{
+  static int left = 131;
+  static int top = 19;
+  tft.fillRect(left, top, 14, 16, ILI9341_BLACK);
+  if (connected)
+  {
+    tft.drawBitmap(left, top, image_bluetooth_connected_bits, 14, 16, theme.modeTitle);
+  }
+  else
+  {
+    tft.drawBitmap(left, top, image_bluetooth_not_connected_bits, 14, 16, theme.modeTitle);
+  }
+}
+
+void Display::drawRecIcon(bool recording)
+{
+  static int left = 122;
+  static int top = 40;
+  tft.fillRect(left, top, 15, 16, ILI9341_BLACK);
+  if (recording)
+  {
+    tft.drawBitmap(left, top, image_music_record_bits, 15, 16, theme.modeTitle);
+  }
 }

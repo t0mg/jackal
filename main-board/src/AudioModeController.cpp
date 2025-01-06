@@ -1,5 +1,12 @@
 #include "AudioModeController.h"
 
+void AudioModeController::setDisplayTheme()
+{
+  display.clear();
+  display.setTheme(theme);
+  display.drawModeTitle(getMode());
+}
+
 void AudioModeController::setMixerGains()
 {
   auto *main = audio.getMainMixer();

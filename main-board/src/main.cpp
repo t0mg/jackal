@@ -18,7 +18,6 @@
 #include "Recorder.h"
 #include "sound/boot_sound.h"
 #include "sound/boop.h"
-#include "sprites/hold_to_record.h"
 #include "AudioSystem.h"
 #include "AudioModeController.h"
 #include "AudioModeControllerNull.h"

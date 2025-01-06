@@ -27,7 +27,9 @@ public:
   void update();
   void updateAsync();
   void updateClock();
-  void setModeTitle(const char *modeText);
+  void drawModeTitle(AudioMode mode);
+  void drawRecIcon(bool recording);
+  void drawBtIcon(bool connected);
   void debugText(char *msg);
   void clampAndPrint(const char *text, int maxChars);
   void setMetadata(const char *textBig, const char *textSmall);
@@ -36,7 +38,6 @@ public:
   void clearMainArea();
   void clearMetadataArea();
   void clear();
-  void drawHoldToRecord();
   void setTemporaryMetadata(const char *line1, const char *line2, unsigned long duration);
   void clearTemporaryMetadata();
   bool hasTemporaryMetadata() const;

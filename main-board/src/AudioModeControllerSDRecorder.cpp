@@ -4,9 +4,8 @@ void AudioModeControllerSDRecorder::enter()
 {
   setMixerGains();
   configureCodec();
+  setDisplayTheme();
   i2c.setCurrentMode(MODE_SD_RECORDER);
-  display.setTheme(theme);
-  display.setModeTitle("Recorder");
   updateOutputVolume(); // This will mute output in recorder mode
   recorder.setReverseAlphabeticalOrder(true);
   recorder.setBasePath("Recordings/");

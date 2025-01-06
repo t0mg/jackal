@@ -5,9 +5,8 @@ void AudioModeControllerSDPlayer::enter()
   updateOutputVolume();
   setMixerGains();
   configureCodec();
+  setDisplayTheme();
   i2c.setCurrentMode(MODE_SD_PLAYBACK);
-  display.setTheme(theme);
-  display.setModeTitle("Player");
   recorder.setReverseAlphabeticalOrder(true);
   recorder.setBasePath("Recordings/");
   recorder.seekToFirstFile();

@@ -5,9 +5,8 @@ void AudioModeControllerBluetooth::enter()
   setMixerGains();
   configureCodec();
   updateOutputVolume();
+  setDisplayTheme();
   i2c.setCurrentMode(MODE_BLUETOOTH);
-  display.setTheme(theme);
-  display.setModeTitle("Bluetooth");
 }
 
 void AudioModeControllerBluetooth::exit()
@@ -21,6 +20,8 @@ void AudioModeControllerBluetooth::loop()
 
 void AudioModeControllerBluetooth::frameLoop()
 {
+  display.drawBtIcon(i2c.getMetadata().isConnected);
+
   if (i2c.getMetadata().isPlaying && !display.hasTemporaryMetadata())
   {
     display.setMetadata(

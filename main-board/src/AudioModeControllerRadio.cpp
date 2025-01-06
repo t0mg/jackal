@@ -5,13 +5,12 @@ void AudioModeControllerRadio::enter()
   setMixerGains();
   configureCodec();
   updateOutputVolume();
+  setDisplayTheme();
   i2c.setCurrentMode(MODE_RADIO);
   if (!radio.isInitialized())
   {
     radio.init();
   }
-  display.setTheme(theme);
-  display.setModeTitle("FM Radio");
 }
 
 void AudioModeControllerRadio::exit()

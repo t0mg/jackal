@@ -37,4 +37,5 @@ public:
   virtual AudioAnalyzePeak *getPeak();
   virtual AudioModeTheme& getTheme() { return theme; }
   virtual void playBeep() { audio.getMemoryPlayer()->play(beep); }
+  virtual void setDisplayTheme();
 };
