@@ -31,7 +31,7 @@ public:
   void drawRecIcon(bool recording);
   void drawBtIcon(bool connected);
   void debugText(char *msg);
-  void clampAndPrint(const char *text, int maxChars);
+  void clampAndPrint(const char *text, int maxWidth = 290);
   void setMetadata(const char *textBig, const char *textSmall);
   void drawSplash();
   void clearTopLeft();

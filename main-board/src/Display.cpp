@@ -144,7 +144,7 @@ void Display::updateClock()
   tft.setFont(neuropolitical_12);
   tft.setTextSize(2);
   tft.fillRect(245, 17, 120, 20, ILI9341_BLACK);
-  tft.setCursor(245, 17);
+  tft.setCursor(245, 17 );
   tft.setTextColor(theme.clockColor);
   tft.print(timeString);
 }
@@ -160,16 +160,35 @@ void Display::debugText(char *text)
   tft.print(text);
 }
 
-void Display::clampAndPrint(const char *text, int maxChars)
+void Display::clampAndPrint(const char *text, int maxWidth)
 {
-  if (static_cast<int>(strlen(text)) > maxChars - 1)
+  int pixelLen = tft.strPixelLen(text);
+  
+  if (pixelLen > maxWidth)
   {
-    char truncated[maxChars];
-    strncpy(truncated, text, maxChars - 4);
-    truncated[maxChars - 4] = '.';
-    truncated[maxChars - 3] = '.';
-    truncated[maxChars - 2] = '.';
-    truncated[maxChars - 1] = '\0';
+    // Create a buffer large enough for the text
+    int textLen = strlen(text);
+    char truncated[textLen + 1];
+    strcpy(truncated, text);
+    
+    // Binary search to find the maximum characters that fit
+    int left = 0;
+    int right = textLen;
+    
+    while (left < right) {
+      int mid = (left + right + 1) / 2;
+      strcpy(truncated, text);
+      truncated[mid] = '\0';
+      if (tft.strPixelLen(truncated) <= maxWidth - tft.strPixelLen("...")) {
+        left = mid;
+      } else {
+        right = mid - 1;
+      }
+    }
+    
+    // Add ellipsis
+    truncated[left] = '\0';
+    strcat(truncated, "...");
     tft.print(truncated);
   }
   else
@@ -317,12 +336,12 @@ void Display::setMetadata(const char *textBig, const char *textSmall)
   tft.setTextSize(2);
   tft.setCursor(20, 190);
   tft.setTextColor(theme.metadataLine1);
-  clampAndPrint(bigBuffer, 21);
+  clampAndPrint(bigBuffer);
 
   tft.setFont(neuropolitical_10);
   tft.setTextColor(theme.metadataLine2);
   tft.setCursor(20, 210);
-  clampAndPrint(smallBuffer, 28);
+  clampAndPrint(smallBuffer);
 }
 
 void Display::drawSplash()
@@ -451,7 +470,7 @@ bool Display::hasTemporaryMetadata() const
 
 void Display::drawBtIcon(bool connected)
 {
-  static int left = 131;
+  static int left = 133;
   static int top = 19;
   tft.fillRect(left, top, 14, 16, ILI9341_BLACK);
   if (connected)
@@ -467,7 +486,7 @@ void Display::drawBtIcon(bool connected)
 void Display::drawRecIcon(bool recording)
 {
   static int left = 122;
-  static int top = 40;
+  static int top = 19;
   tft.fillRect(left, top, 15, 16, ILI9341_BLACK);
   if (recording)
   {

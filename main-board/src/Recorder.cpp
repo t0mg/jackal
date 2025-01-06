@@ -155,7 +155,8 @@ void Recorder::playFile(const char *filename)
   LOG_RECORDER_MSG(filename);
 
   // Enforce cooldown period
-  while (millis() - lastSDOperation < SD_COOLDOWN_MS)
+  elapsedMillis cooldownTimer = 0;
+  while (cooldownTimer < SD_COOLDOWN_MS)
   {
     yield(); // Allow other processes to run during wait
   }
@@ -163,12 +164,20 @@ void Recorder::playFile(const char *filename)
   String filePath = String(basePath) + filename;
   if (SD.exists(filePath.c_str()))
   {
-    // Stop current playback and wait for it to complete
+    // Stop current playback and ensure it's complete
     playWav1.stop();
+    delay(10); // Short delay to ensure stop completes
     state = State::STOPPED;
 
     // Clear any remaining audio buffers
     AudioMemoryUsageMaxReset();
+    
+    // Add additional cooldown after stop
+    cooldownTimer = 0;
+    while (cooldownTimer < SD_COOLDOWN_MS/2)
+    {
+      yield();
+    }
 
     if (playWav1.play(filePath.c_str()))
     {
@@ -297,6 +306,8 @@ bool Recorder::deleteCurrentFile()
   bool success = SD.remove((String(basePath) + oldFilename).c_str());
   if (success)
   {
+    currentFilename[0] = '\0';
+    lastSDOperation = millis();
     seek(); // Find next file after deletion
   }
   return success;

@@ -35,9 +35,6 @@ void AudioModeControllerSDPlayer::frameLoop()
     {
       playBeep();
       display.setTemporaryMetadata((char *)"File", (char *)"Deleted", 3000);
-      display.update();
-      delay(2000);
-      recorder.seek();
     }
   }
   else
@@ -57,7 +54,7 @@ void AudioModeControllerSDPlayer::handleOrangeButton(bool pressed)
   {
     orangeButtonPressed = true;
     orangeButtonTimer = 0;
-    display.setTemporaryMetadata("Hold to delete", "current file", 2000);
+    display.setTemporaryMetadata("Hold to delete", "current file", 3000);
   }
   else
   {
@@ -121,6 +118,6 @@ void AudioModeControllerSDPlayer::setMixerGains()
 void AudioModeControllerSDPlayer::configureCodec()
 {
   auto *codec = audio.getCodec();
-  codec->volume(1.0);
+  codec->volume(0.8);
   codec->enhanceBassDisable(); // Disable bass enhancement for SD playback
 }

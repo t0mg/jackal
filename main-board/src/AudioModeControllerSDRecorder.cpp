@@ -31,8 +31,14 @@ void AudioModeControllerSDRecorder::loop()
 void AudioModeControllerSDRecorder::frameLoop()
 {
   char line1[32], line2[32];
-  recorder.getMetadata(line1, line2);
+  if (recorder.isRecording()) {
+    recorder.getMetadata(line1, line2);
+  } else {
+    strcpy(line1, "Hold ORANGE BUTTON");
+    strcpy(line2, "to start a new recording");
+  }
   display.setMetadata(line1, line2);
+  display.drawRecIcon(recorder.isRecording());
 }
 
 void AudioModeControllerSDRecorder::handleOrangeButton(bool pressed)
