@@ -148,3 +148,5 @@ The platformio.ini runs a [script](cleanup_libdeps.py) to remove some example di
 Additionally, a couple of libraries are copied directly in the lib:
 - [Ricardo Lima Caratti's RDA5807](https://github.com/pu2clr/RDA5807)
 - Some classes from [JayShoe's esp32_T4_bt_music_receiver](https://github.com/JayShoe/esp32_T4_bt_music_receiver)
+
+The UI uses the [Neuropolitical](http://www.dafont.com/neuropolitical.font) font converted with the [ILI9341 Font Editor](https://www.pjrc.com/ili9341_t3-font-editor/) by Wojciech Sura.
