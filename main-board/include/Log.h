@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 // Set to 1 to enable logging, 0 to disable
-#define ENABLE_LOGGING 1
+#define ENABLE_LOGGING 0
 
 // Logging categories - can be individually enabled/disabled
 #define LOG_I2C        1
@@ -70,8 +70,12 @@
     #define LOG_I2C_MSGF(...)
     #define LOG_BT_MSG(msg)
     #define LOG_BT_MSGF(...)
+    #define LOG_RECORDER_MSG(msg)
+    #define LOG_RECORDER_MSGF(...)
     #define LOG_DISPLAY_MSG(msg)
     #define LOG_DISPLAY_MSGF(...)
     #define LOG_AUDIO_MSG(msg)
     #define LOG_AUDIO_MSGF(...)
+    #define LOG_FM_MSG(msg)
+    #define LOG_FM_MSGF(...)
 #endif
