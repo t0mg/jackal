@@ -209,7 +209,7 @@ void FFT::drawNewLevels(Display *display, uint8_t tuning)
 
 void FFT::readLevels()
 {
-  const float MAGIC_FACTOR = 2;
+  const float MAGIC_FACTOR = 1.5;
 
   _level[0] = _fft->read(0, 1) * 1.000 * MAGIC_FACTOR;
   _level[1] = _fft->read(2, 3) * 1.552 * MAGIC_FACTOR;

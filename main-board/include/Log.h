@@ -7,7 +7,7 @@
 // Logging categories - can be individually enabled/disabled
 #define LOG_I2C        1
 #define LOG_BLUETOOTH  0
-#define LOG_RECORDER   1
+#define LOG_RECORDER   0
 #define LOG_DISPLAY    0
 #define LOG_AUDIO      0
 #define LOG_FM         0

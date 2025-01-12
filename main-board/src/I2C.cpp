@@ -150,8 +150,15 @@ void I2C::loop()
       lastRetryTime = 0;
     }
   }
-  else if (i2cTimer.shouldPollBluetooth() && currentMode_ == MODE_BLUETOOTH)
+  else if (i2cTimer.shouldPollBluetooth())
   {
+    if (currentMode_ != MODE_BLUETOOTH) {
+      // Skip polling if not in Bluetooth mode
+      i2cTimer.resetTimeout();
+      i2cTimer.markBTPolled();
+      i2cTimer.releaseBus();
+      return;
+    }
     LOG_BT_MSG("Polling Bluetooth");
     String data = requestDataFromBluetooth();
     if (data.length() > 0)

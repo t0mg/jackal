@@ -1,4 +1,5 @@
 #include "I2CTimer.h"
+#include "Log.h"
 
 I2CTimer::I2CTimer() {
     firstIOPoll = 0;
@@ -87,14 +88,14 @@ void I2CTimer::update() {
     // Check for timeout only if we haven't had a response in TIMEOUT ms
     if (!timeoutFlag && (currentTime - lastResponse) >= TIMEOUT) {
         timeoutFlag = true;
-        // Serial.println("Setting timeout flag - last response was " + String(currentTime - lastResponse) + "ms ago");
     }
 
     // Auto-release bus if operation takes too long
-    if (currentOperation != NONE && 
-        (currentTime - operationStartTime) >= OPERATION_TIMEOUT) {
-        Serial.println("########################## Operation timeout - releasing bus from " + String(currentOperation));
-        releaseBus();
+    if (currentOperation != NONE) {
+        if ((currentTime - operationStartTime) >= OPERATION_TIMEOUT) {
+            LOG_I2C_MSG("I2C Timer: Operation timeout - releasing bus from " + String(currentOperation));
+            releaseBus();
+        }
     }
 }
 

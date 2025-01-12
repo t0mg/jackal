@@ -73,7 +73,6 @@ void FM::checkRDS()
 {
   LOG_FM_MSGF("Checking RDS %d", millis());
 
-  // Refresh the current frequency
   updateRealFrequency();
 
   if (!rx.hasRdsInfo())
@@ -88,31 +87,45 @@ void FM::checkRDS()
 
   if (tempRdsMsg != nullptr)
   {
-    LOG_FM_MSGF("RDS message: %s", tempRdsMsg);
-    tempRdsMsg[22] = '\0'; // Ensure null termination
-    newRDSMsg = strcmp(bufferRdsMsg, tempRdsMsg) != 0;
-    if (newRDSMsg) {
-      strncpy(bufferRdsMsg, tempRdsMsg, sizeof(bufferRdsMsg) - 1);
-      bufferRdsMsg[sizeof(bufferRdsMsg) - 1] = '\0'; // Ensure null termination
-      rdsMsg = bufferRdsMsg;                         // Update the public member
+    // Validate RDS message contains only printable characters
+    bool valid = true;
+    for (int i = 0; tempRdsMsg[i] != '\0' && i < 64; i++) {
+      if (!isprint(tempRdsMsg[i]) && !isspace(tempRdsMsg[i])) {
+        valid = false;
+        break;
+      }
+    }
+
+    if (valid) {
+      LOG_FM_MSGF("RDS message: %s", tempRdsMsg);
+      tempRdsMsg[22] = '\0';
+      newRDSMsg = strcmp(bufferRdsMsg, tempRdsMsg) != 0;
+      if (newRDSMsg) {
+        strncpy(bufferRdsMsg, tempRdsMsg, sizeof(bufferRdsMsg) - 1);
+        bufferRdsMsg[sizeof(bufferRdsMsg) - 1] = '\0';
+        rdsMsg = bufferRdsMsg;
+      }
     }
   }
-  else
-  {
-    LOG_FM_MSG("No RDS message available");
-  }
 
-  if ((millis() - stationNameElapsed) > 1000)
+  if (tempStationName != nullptr && (millis() - stationNameElapsed) > 1000)
   {
-    if (tempStationName != nullptr)
-    {
+    // Validate station name contains only printable characters
+    bool valid = true;
+    for (int i = 0; tempStationName[i] != '\0' && i < 16; i++) {
+      if (!isprint(tempStationName[i]) && !isspace(tempStationName[i])) {
+        valid = false;
+        break;
+      }
+    }
+
+    if (valid) {
       LOG_FM_MSGF("Station name: %s", tempStationName);
       newStationName = strncmp(bufferStatioName, tempStationName, 3) != 0;
-      if (newStationName)
-      {
+      if (newStationName) {
         strncpy(bufferStatioName, tempStationName, sizeof(bufferStatioName) - 1);
-        bufferStatioName[sizeof(bufferStatioName) - 1] = '\0'; // Ensure null termination
-        stationName = bufferStatioName;                        // Update the public member
+        bufferStatioName[sizeof(bufferStatioName) - 1] = '\0';
+        stationName = bufferStatioName;
       }
     }
     else

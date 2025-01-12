@@ -11,7 +11,7 @@ public:
     static const uint8_t MAX_RETRIES = 0;                 // 0 retries for now
     static const unsigned long TIMEOUT = 5000;            // Increased timeout if needed
     static const unsigned long WARMUP_PERIOD = 5000;      // Time to wait for IO measurements to stabilize
-    static const unsigned long RDS_POLL_INTERVAL = 300;   // RDS should be polled frequently
+    static const unsigned long RDS_POLL_INTERVAL = 403;   // RDS should be polled frequently
 
     // Add priority levels
     enum BusOperation {
