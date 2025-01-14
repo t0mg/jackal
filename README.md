@@ -1,6 +1,12 @@
-# Jackal
+# Jackal project 
 
-A battery powered, multi-mode audio system built around the almighty Teensy 4.0 microcontroller (main-board) that supports Bluetooth audio with metadata, FM radio with RDS, SD card playback/recording (over built-in microphone), and NFC-triggered playlists.
+<img width="100%" alt="Jackal project banner" src="https://github.com/user-attachments/assets/f1732aa2-d4d8-46c6-8610-b3213fc993b4" />
+<br>
+<br>
+A battery operated, multi-mode audio system built in an upcycled 1978 Sony FX-300, that supports Bluetooth audio with metadata, FM radio with RDS, SD card playback/recording (over built-in microphone), and NFC-triggered playlists.
+<br>
+<br>
+<img width="100%" alt="Jackal project photos" src="https://github.com/user-attachments/assets/5fbd90b5-b067-4e28-ba42-1b0794df358f" />
 
 In 2021, I upcycled a defunct 1978 Sony FX-300 — aka _Jackal_ — portable tv/radio set into a modern audio system, as detailed [in this story](https://threadreaderapp.com/thread/1465465658519572480.html). I didn't release any code at the time because it was not fully working (bluetooth was analog, FM radio didn't work, the sound quality was not good enough, the TFT display wan't great either).
 
