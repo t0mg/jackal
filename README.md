@@ -1,13 +1,14 @@
 # Jackal project 
 
 <img width="100%" alt="Jackal project banner" src="https://github.com/user-attachments/assets/f1732aa2-d4d8-46c6-8610-b3213fc993b4" />
-<br>
-<br>
-A battery operated, multi-mode audio system built in an upcycled 1978 Sony FX-300, that supports Bluetooth audio with metadata, FM radio with RDS, SD card playback/recording (over built-in microphone), and NFC-triggered playlists.
-<br>
-<br>
+<br><br>
+
+A battery operated, multi-mode audio system built in an upcycled 1978 Sony FX-300, that supports Bluetooth audio with metadata, FM radio with RDS, SD card playback/recording (over built-in microphone), and NFC-triggered playlists – [1 minute trailer](https://www.youtube.com/watch?v=Jtwbudb9z_4).
+<br><br>
+
 <img width="100%" alt="Jackal project photos" src="https://github.com/user-attachments/assets/5fbd90b5-b067-4e28-ba42-1b0794df358f" />
 
+## Context & features
 In 2021, I upcycled a defunct 1978 Sony FX-300 — aka _Jackal_ — portable tv/radio set into a modern audio system, as detailed [in this story](https://threadreaderapp.com/thread/1465465658519572480.html). I didn't release any code at the time because it was not fully working (bluetooth was analog, FM radio didn't work, the sound quality was not good enough, the TFT display wan't great either).
 
 I got back into it in 2024, and after gutting the thing again and redoing it almost from scratch, not forgetting to throw in 2 extra microcontrollers and a good amount of overengineering (that story is detailed [in this Bluesky thread](https://bsky.app/profile/tomgranger.bsky.social/post/3lfksgtyi4c2h) or [here](https://threadreaderapp.com/thread/1878502366451843553.html)), I'm now sharing what I consider the final version of this project. You might not want to build the exact same thing yourself, but I figured this might help inspire other projects.
