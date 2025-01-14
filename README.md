@@ -1,12 +1,10 @@
 # Jackal
 
-**NOTE: this is still a bit of a work in progress :)**
-
 A battery powered, multi-mode audio system built around the almighty Teensy 4.0 microcontroller (main-board) that supports Bluetooth audio with metadata, FM radio with RDS, SD card playback/recording (over built-in microphone), and NFC-triggered playlists.
 
 In 2021, I upcycled a defunct 1978 Sony FX-300 — aka _Jackal_ — portable tv/radio set into a modern audio system, as detailed [in this story](https://threadreaderapp.com/thread/1465465658519572480.html). I didn't release any code at the time because it was not fully working (bluetooth was analog, FM radio didn't work, the sound quality was not good enough, the TFT display wan't great either).
 
-I got back into it in 2024, and after gutting the thing again and redoing it almost from scratch, not forgetting to throw in 2 extra microcontrollers and a good amount of overengineering, I'm now sharing what I consider the final version of this project. You might not want to build the exact same thing yourself, but I figured this might help inspire other projects.
+I got back into it in 2024, and after gutting the thing again and redoing it almost from scratch, not forgetting to throw in 2 extra microcontrollers and a good amount of overengineering (that story is detailed [in this Bluesky thread](https://bsky.app/profile/tomgranger.bsky.social/post/3lfksgtyi4c2h) or [here](https://threadreaderapp.com/thread/1878502366451843553.html)), I'm now sharing what I consider the final version of this project. You might not want to build the exact same thing yourself, but I figured this might help inspire other projects.
 
 This repository contains 3 subfolders as the project now uses 3 microcontrollers. The [`main-board`](./main-board) folder contains the Teensy 4.0 code. The Teensy 4.0 is the main controller, and is designed to be connected to the [bluetooth-sink](./bluetooth-sink) and the [io-board](./io-board).
 
