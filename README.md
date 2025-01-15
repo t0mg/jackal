@@ -34,7 +34,7 @@ Additional features include :
 
 - Teensy 4.0 microcontroller
   - Teensy Audio board with SGTL5000 audio codec & SD card reader
-  - ILI9341 TFT display (SPI interface)
+  - ILI9341 3.2" IPS display (SPI interface)
   - Acts as I2C Controller for other peripherals
   - See [main-board](./main-board/README.md) for more details
 
@@ -56,6 +56,7 @@ Additional features include :
   - See [io-board](./io-board/README.md) for more details
 
 - PAM8406 amplifier (5W)
+- Visaton FR 10 HM 20W speaker (95 - 22000 Hz)
 - 10000 mAh external USB battery
 - Resistors, capacitors, yellow LEDs, and tons of wires.
 
