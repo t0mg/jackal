@@ -6,6 +6,7 @@
 class I2CTimer {
 public:
     static const unsigned long IO_POLL_INTERVAL = 100;    // Increased from 50ms
+    static const unsigned long IO_POLL_INTERVAL_FAST = 30;
     static const unsigned long BT_STATUS_INTERVAL = 450;  // Increased from 100ms
     static const unsigned long RETRY_INTERVAL = 50;       // Time between retries in ms
     static const uint8_t MAX_RETRIES = 0;                 // 0 retries for now
@@ -32,6 +33,7 @@ public:
     bool hasTimeout();
     void resetTimeout();
     void update();
+    void setFastIO(bool fast) { fastIO = fast; }
     void markIOPolled();
     void markBTPolled();
     void markRDSPolled();
@@ -52,6 +54,7 @@ private:
     unsigned long lastRetry;
     bool timeoutFlag;
     bool isRetrying;
+    bool fastIO;
     BusOperation currentOperation;
     unsigned long operationStartTime;
     static const unsigned long OPERATION_TIMEOUT = 200; // ms

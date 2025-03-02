@@ -116,6 +116,10 @@ The system implements different audio modes through a set of controller classes 
    - Sets the time of the Teensy 4.0 RTC
    - Will block other modes until setup is complete
 
+7. **Pong Mode** (`AudioModeControllerPong`)
+   - Not really an audio mode :)
+   - A simple pong clone using the Volume and Tone sliders to control the paddles
+
 ### Development
 
 This project uses PlatformIO for development. Key files:
@@ -150,3 +154,9 @@ Additionally, a couple of libraries are copied directly in the lib:
 - Some classes from [JayShoe's esp32_T4_bt_music_receiver](https://github.com/JayShoe/esp32_T4_bt_music_receiver)
 
 The UI uses the [Neuropolitical](http://www.dafont.com/neuropolitical.font) font converted with the [ILI9341 Font Editor](https://www.pjrc.com/ili9341_t3-font-editor/) by Wojciech Sura.
+
+## Notes
+
+For some reason the project stopped compiling today (01/03/2025) with `.platformio\packages\framework-arduinoteensy\libraries\USBHost_t36\bluetooth.cpp:35:10: fatal error: EEPROM.h: No such file or directory`.
+
+To fix I had to go and edit the file to explicitly point at the eeprom library, replacing `#include <EEPROM.h>` with `#include "../EEPROM/EEPROM.h"`.

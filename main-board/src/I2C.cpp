@@ -78,7 +78,7 @@ void I2C::loop()
   // Handle IO polling first
   if (i2cTimer.shouldPollIO())
   {
-    // LOG_I2C_MSG("Polling IO");
+    LOG_I2C_MSG("Polling IO");
     if (requestDataFromIO(false))
     {
       i2cTimer.resetTimeout();
@@ -245,7 +245,7 @@ bool I2C::requestDataFromIO(bool isRetry)
                 // Only update state and trigger callback after debounce period
                 LOG_I2C_MSGF("NFC UID changed (no tag): %s\n", newNfcUidString.c_str());
                 ioState_.nfcUidString = newNfcUidString;
-                if (nfcTagCallback_) {
+                if (nfcTagCallback_ && !i2cTimer.isWarmingUp()) {
                     nfcTagCallback_("000000000000FF");
                 }
                 noTagTimerStarted = false;

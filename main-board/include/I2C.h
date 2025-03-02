@@ -71,7 +71,7 @@ public:
   }
   void init(void);
   void loop(void);
-  I2CTimer getTimer() { return i2cTimer; }
+  I2CTimer& getTimer() { return i2cTimer; }
   void btPlay();
   void btPause();
   void btPrevious();

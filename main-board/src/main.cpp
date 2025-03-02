@@ -1,6 +1,7 @@
 #define DEBUG
 #define ENABLE_MTP
 
+#include <EEPROM.h>
 #include <Audio.h>
 #include <Wire.h>
 #include <TimeLib.h>
@@ -22,10 +23,11 @@
 #include "AudioModeController.h"
 #include "AudioModeControllerNull.h"
 #include "AudioModeControllerBluetooth.h"
+#include "AudioModeControllerNFCPlayer.h"
+#include "AudioModeControllerPong.h"
 #include "AudioModeControllerRadio.h"
 #include "AudioModeControllerSDPlayer.h"
 #include "AudioModeControllerSDRecorder.h"
-#include "AudioModeControllerNFCPlayer.h"
 #include "AudioModeControllerTimeSetup.h"
 
 #define PIN_VUMETER 14
@@ -71,9 +73,13 @@ void setMTPdeviceChecks(bool enable)
   }
 }
 
-AudioMode computeMode(bool inputButtonPressed, bool bandButtonPressed)
+AudioMode computeMode(bool inputButtonPressed, bool bandButtonPressed, bool orangeButtonPressed = false)
 {
   LOGF("Input button: %d, Band button: %d\n", inputButtonPressed, bandButtonPressed);
+  if (orangeButtonPressed)
+  {
+    return MODE_PONG;
+  }
   if (inputButtonPressed)
   {
     // Input button pressed = Bluetooth or Radio modes
@@ -152,6 +158,9 @@ void updateMode(AudioMode newMode)
     break;
   case MODE_TIME_SETUP:
     audioController = new AudioModeControllerTimeSetup(display, i2c, audioSystem);
+    break;
+  case MODE_PONG:
+    audioController = new AudioModeControllerPong(display, i2c, audioSystem);
     break;
   default:
     audioController = &nullController;
@@ -342,10 +351,11 @@ void setup()
     IOState initialState = i2c.getIOState();
     bool bandPressed = initialState.buttonStates & BAND_BTN;
     bool inputPressed = initialState.buttonStates & INPUT_BTN;
+    bool orangePressed = initialState.buttonStates & ORANGE_BTN;
 
-    LOGF("Initial button states - Input: %d, Band: %d\n", inputPressed, bandPressed);
+    LOGF("Initial button states - Input: %d, Band: %d, Orange: %d\n", inputPressed, bandPressed, orangePressed);
 
-    updateMode(computeMode(inputPressed, bandPressed));
+    updateMode(computeMode(inputPressed, bandPressed, orangePressed));
     LOGF("Initial mode set to: %d\n", audioController->getMode());
   }
 
@@ -381,6 +391,7 @@ void loop()
     MTP.loop();
   }
 
+  auto currentMode = audioController->getMode();
   audioController->loop();
 
   // Main audio/display loop
@@ -397,7 +408,7 @@ void loop()
       SNVS_LPGPR1 = now();
     }
 
-    if (i2c.getIOState().volume == 0 && audioController->getMode() != MODE_SD_RECORDER)
+    if (i2c.getIOState().volume == 0 && currentMode != MODE_SD_RECORDER)
     {
       analogWrite(PIN_VUMETER, 0);
     }
@@ -412,14 +423,16 @@ void loop()
       analogWrite(PIN_VUMETER, monoPeak);
     }
 
-    float tonePotVal = map((float)i2c.getIOState().tone, 0.f, 255.f, 0.f, 1.f);
-    int mappedVal = getMappedValue(tonePotVal, BIT_DEPTHS, BIT_DEPTHS_LENGTH);
-    int mappedVal2 = getMappedValue(tonePotVal, SAMPLE_RATES, SAMPLE_RATES_LENGTH);
+    if (currentMode != MODE_PONG) {
+      float tonePotVal = map((float)i2c.getIOState().tone, 0.f, 255.f, 0.f, 1.f);
+      int mappedVal = getMappedValue(tonePotVal, BIT_DEPTHS, BIT_DEPTHS_LENGTH);
+      int mappedVal2 = getMappedValue(tonePotVal, SAMPLE_RATES, SAMPLE_RATES_LENGTH);
 
-    audioSystem.getBitcrusher()->bits(mappedVal);
-    audioSystem.getBitcrusher()->sampleRate(mappedVal2);
+      audioSystem.getBitcrusher()->bits(mappedVal);
+      audioSystem.getBitcrusher()->sampleRate(mappedVal2);
+    }
 
-    if (!needsTimeSetup && fft.available())
+    if (!needsTimeSetup && currentMode != MODE_PONG && fft.available())
     {
       display.clearMainArea();
       display.tft.setClipRect(0, 40, 320, 140);

@@ -8,7 +8,8 @@ enum AudioMode
   MODE_RADIO,
   MODE_SD_PLAYBACK,
   MODE_SD_RECORDER,
-  MODE_NFC_PLAYBACK
+  MODE_NFC_PLAYBACK,
+  MODE_PONG
 };
 
 struct AudioModeTheme {
