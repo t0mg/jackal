@@ -5,12 +5,12 @@ Part of the [Jackal project](../), this project implements a Teensy 4.0-based co
 ## Hardware
 
 - **MCU**: Teensy 4.0
-- **Display**: ILI9341 TFT
+- **Display**: 3.2" ILI9341 IPS LCD 
 - **Audio**: Teensy audio board
 
 ## Pinout
 
-| Teensy 4.0 Pin | Audio Board | TFT Screen | Bluetooth Module | I2C Controller | Other Connections | Description |
+| Teensy 4.0 Pin | Audio Board | LCD | Bluetooth Module | I2C Controller | Other Connections | Description |
 |------------|-------------|------------|------------------|-------------|-------------------|-------------|
 | G |  | GND |  |  |  | Ground |
 | 0 |  | CS |  |  |  | Chip Select |
@@ -53,7 +53,7 @@ The Micro USB port is used for powering the Teensy 4.0 from a battery (or comput
 - For the pinout of the other microcontrollers in the project, see [io-board README](../io-board/README.md), and [bluetooth-sink README](../bluetooth-sink/README.md)
 - All I2C lines (SDA/SCL) require 4.7k Ω pull-up resistors to 3.3V
 - The Bluetooth module uses a separate I2S interface as well as I2C as target
-- Multiple SPI devices (TFT, SD card, memory) share the same bus with different CS lines
+- LCD uses a separate SPI bus due to SD noise issues
 
 ## Architecture
 
@@ -68,7 +68,7 @@ Manages the audio processing pipeline using the Teensy Audio Library. Handles:
 - Audio routing between different inputs/outputs
 
 #### Display (`Display`)
-Controls the ILI9341 TFT display to show:
+Controls the 3.2" ILI9341 IPS LCD to show:
 - Current mode
 - Metadata (song info, radio station, etc)
 - Time
